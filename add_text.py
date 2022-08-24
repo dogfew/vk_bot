@@ -55,13 +55,13 @@ def add_photos(event, database):
 
 
 def clear_photos(event, database):
-    args = event.message.text.split(" ")
-    match len(args):
-        case 1:
+    args = tuple(event.message.text.split(" "))
+    match args:
+        case command, :
             to_id = str(event.message['from_id'])
             database[to_id] = database.get(to_id, {})
             database[to_id]["links"] = []
-        case 2:
+        case command, to_id:
             to_id = args[1]
             database[to_id] = database.get(to_id, {})
             database[to_id]["links"] = []
