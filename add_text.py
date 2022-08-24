@@ -20,10 +20,10 @@ def make_image(text, in_image, out_image):
 
 def make_image_web(text, url, out_image):
     image = Image.open(requests.get(url, stream=True).raw)
-    font = ImageFont.truetype("fonts/Ubuntu-B.ttf", 42)
+    font = ImageFont.truetype("fonts/Ubuntu-B.ttf", 35)
     margin = offset = 20
     with Pilmoji(image) as pilmoji:
-        for line in textwrap.wrap(text, width=20):
+        for line in textwrap.wrap(text, width=image.size[0] // 35):
             pilmoji.text((margin, offset), line, font=font, fill='black')
             offset += font.getsize(line)[1]
     image.save("temp_images/" + out_image)
