@@ -1,14 +1,13 @@
 import os
 import random
-import json
-import requests
 import vk_api
 
 from vk_api import VkUpload
 from vk_api.utils import get_random_id
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
-from add_text import make_image, make_image_web, add_photos, clear_photos
+from create_image import make_image_file, make_image_web
+from database_utils import database, add_photos, clear_photos
 from config import TOKEN, GROUP_ID
 
 try:
@@ -22,16 +21,8 @@ longpoll = VkBotLongPoll(vk_session, group_id=GROUP_ID)
 upload = VkUpload(vk_session)
 vk = vk_session.get_api()
 
-session = requests.Session()
 
-database = json.load(open("persons.json"))
-for key in database:
-    name = database[key]['name']
-    lst = [img for img in os.listdir("images") if img.startswith(name)]
-    database[key]["images"] = lst
-
-
-def main(database):
+def main():
     for event in longpoll.listen():
 
         if event.type == VkBotEventType.MESSAGE_NEW and event.from_chat:
@@ -39,9 +30,9 @@ def main(database):
             msg_rec = event.message.text.lower()
             from_id = str(event.message['from_id'])
             if msg_rec.startswith("!фото"):
-                database = add_photos(event, database)
+                add_photos(event)
             elif msg_rec.startswith("!clear"):
-                database = clear_photos(event, database)
+                clear_photos(event)
             elif from_id in database:
                 attachments = []
 
@@ -54,13 +45,11 @@ def main(database):
                 if links_lst or images_lst:
                     if images_lst:
                         image = random.choice(images_lst)
-                        out_image = f"temp_{image}"
-                        make_image(msg_rec, image, out_image)
+                        make_image_file(msg_rec, image)
                     if links_lst:
                         image = random.choice(links_lst)
-                        out_image = f"tmp.jpg"
-                        make_image_web(msg_rec, image, out_image)
-                    photo = upload.photo_messages(photos=f"temp_images/{out_image}")[0]
+                        make_image_web(msg_rec, image)
+                    photo = upload.photo_messages(photos=f"temp_images/tmp.jpg")[0]
                     attachments.append(
                         f"photo{photo['owner_id']}_{photo['id']}"
                     )
@@ -73,4 +62,4 @@ def main(database):
 
 
 if __name__ == "__main__":
-    main(database)
+    main()
