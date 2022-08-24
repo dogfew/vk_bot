@@ -1,3 +1,4 @@
 Pillow==9.2.0
 vk-api==11.9.9
 pilmoji~=2.0.2
+requests~=2.28.1
