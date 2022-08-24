@@ -36,7 +36,7 @@ def main():
             if msg_rec.startswith("!"):
                 for command, func in commands.items():
                     if msg_rec.startswith(command):
-                        try_func(func(event), event)
+                        try_func(func, event)
                         break
                         
             elif from_id in database and not database[from_id].get("ignor", False):
@@ -77,7 +77,7 @@ def report_bug(event, error):
 
 def try_func(func, event):
     try:
-        func
+        func(event)
     except Exception as e:
         report_bug(event, e)
 
