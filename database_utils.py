@@ -2,8 +2,6 @@ import os
 import re
 from json import dump, load
 
-max_id = 9419901116
-
 
 def dump_db():
     with open("persons.json", "w") as write_database:
