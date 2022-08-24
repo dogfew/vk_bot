@@ -7,8 +7,9 @@ from vk_api.utils import get_random_id
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
 from create_image import make_image_file, make_image_web
-from database_utils import database, add_photos, clear_photos, ignor, change_name, change_audio, check_status
+from database_utils import database
 from config import TOKEN, GROUP_ID
+from commands import commands
 
 try:
     TOKEN = os.environ['ACCESS_TOKEN']
@@ -31,40 +32,13 @@ def main():
 
             msg_rec = event.message.text
             from_id = str(event.message['from_id'])
-            if msg_rec.startswith("!status") or msg_rec.startswith("!стат"):
-                try_func(
-                    vk.messages.send(
-                        random_id=get_random_id(),
-                        message=check_status(event),
-                        chat_id=event.chat_id,
-                    ),
-                    event
-                )
-            elif msg_rec.startswith("!photo") or msg_rec.startswith("!фото"):
-                try_func(
-                    add_photos(event),
-                    event
-                )
-            elif msg_rec.startswith("!clear") or msg_rec.startswith("!оч"):
-                try_func(
-                    clear_photos(event),
-                    event
-                )
-            elif msg_rec.startswith("!ignor") or msg_rec.startswith("!игнор"):
-                try_func(
-                    ignor(event),
-                    event
-                )
-            elif msg_rec.startswith("!name") or msg_rec.startswith("!имя"):
-                try_func(
-                    change_name(event),
-                    event
-                )
-            elif msg_rec.startswith("!audio") or msg_rec.startswith("!аудио"):
-                try_func(
-                    change_audio(event),
-                    event
-                )
+            
+            if msg_rec.startswith("!"):
+                for command, func in commands.items():
+                    if msg_rec.startswith(command):
+                        try_func(func(event), event)
+                        break
+                        
             elif from_id in database and not database[from_id].get("ignor", False):
                 attachments = []
 

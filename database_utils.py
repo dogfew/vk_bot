@@ -17,41 +17,40 @@ def update_photos(user_id):
 
 with open("persons.json") as load_database:
     database = load(open("persons.json"))
-    for key in database:
-        update_photos(key)
+    for user_id in database:
+        update_photos(user_id)
 
 
 def extract_id(event, num=2):
     args = event.message.text.split(" ")
     if len(args) >= num:
-        to_id = "".join(re.findall(r"\[id(\d*)\|.*]", event.message.text))
+        regexp = r"\[id(\d*)\|.*]"
+        to_id = "".join(re.findall(regexp, event.message.text))
     else:
         to_id = str(event.message['from_id'])
     database[to_id] = database.get(to_id, {})
     return to_id if to_id.isnumeric() else ""
 
 
-def change_audio(event):
-    to_id = extract_id(event)
+def add_audio(event):
     attachments = event.message['attachments']
     audio = None
     for dictionary in attachments:
         if dictionary.get("audio", None):
-            audio = "audio{}_{}".format(
-                dictionary["audio"]["owner_id"],
-                dictionary["audio"]["id"]
-            )
+            audio = "audio{}_{}".format(dictionary["audio"]["owner_id"], dictionary["audio"]["id"])
             break
+            
+    to_id = extract_id(event)
     database[to_id]["audio"] = audio
     dump_db()
 
 
 def add_photos(event):
-    photos = []
     attachments = event.message['attachments']
-    for photo_dict in attachments:
-        if photo_dict.get("photo", None):
-            url = photo_dict["photo"]["sizes"][-1]["url"]
+    photos = []
+    for dictionary in attachments:
+        if dictionary.get("photo", None):
+            url = dictionary["photo"]["sizes"][-1]["url"]
             photos.append(url)
 
     to_id = extract_id(event)
@@ -68,8 +67,7 @@ def clear_photos(event):
 
 def ignor(event):
     to_id = extract_id(event)
-    database[to_id]["ignor"] = database[to_id].get("ignor", False)
-    database[to_id]["ignor"] = not database[to_id]["ignor"]
+    database[to_id]["ignor"] = not database[to_id].get("ignor", False)
     dump_db()
 
 
@@ -83,7 +81,12 @@ def change_name(event):
 
 
 def check_status(event):
+    from main import vk, get_random_id
     to_id = extract_id(event)
     out = f"User id: {to_id}\n"
     out += "\n".join(f"{k}: {v}".capitalize() for k, v in database[to_id].items())
-    return out
+    vk.messages.send(
+        random_id=get_random_id(),
+        message=out,
+        chat_id=event.chat_id,
+    )
