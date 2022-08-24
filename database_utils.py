@@ -82,3 +82,10 @@ def change_name(event):
     database[to_id]["name"] = name
     update_photos(to_id)
     dump_db()
+
+
+def check_status(event):
+    to_id = extract_id(event)
+    out = f"User id: {to_id}\n"
+    out += "\n".join(f"{k}: {v}".capitalize() for k, v in database[to_id].items())
+    return out
