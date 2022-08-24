@@ -48,23 +48,23 @@ def main():
 
                 if audio:
                     attachments.append(audio)
-                if links_lst or images_lst:
-                    if images_lst:
-                        image = random.choice(images_lst)
-                        make_image_file(msg_rec, image)
-                    if links_lst:
-                        image = random.choice(links_lst)
-                        make_image_web(msg_rec, image)
-                    photo = upload.photo_messages(photos=f"temp_images/tmp.jpg")[0]
-                    attachments.append(
-                        f"photo{photo['owner_id']}_{photo['id']}"
-                    )
-                if attachments:
-                    vk.messages.send(
-                        random_id=get_random_id(),
-                        attachment=attachments,
-                        chat_id=event.chat_id,
-                    )
+                if links_lst:
+                    image = random.choice(links_lst)
+                    make_image_web(msg_rec, image)
+                elif images_lst:
+                    image = random.choice(images_lst)
+                    make_image_file(msg_rec, image)
+                if not attachments:
+                    continue
+                photo = upload.photo_messages(photos=f"temp_images/tmp.jpg")[0]
+                attachments.append(
+                    f"photo{photo['owner_id']}_{photo['id']}"
+                )
+                vk.messages.send(
+                    random_id=get_random_id(),
+                    attachment=attachments,
+                    chat_id=event.chat_id,
+                )
 
 
 def report_bug(event, error):
