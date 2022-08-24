@@ -54,12 +54,12 @@ def main():
                 elif images_lst:
                     image = random.choice(images_lst)
                     make_image_file(msg_rec, image)
-                if not attachments:
-                    continue
                 photo = upload.photo_messages(photos=f"temp_images/tmp.jpg")[0]
                 attachments.append(
                     f"photo{photo['owner_id']}_{photo['id']}"
                 )
+                if not attachments:
+                    continue
                 vk.messages.send(
                     random_id=get_random_id(),
                     attachment=attachments,
